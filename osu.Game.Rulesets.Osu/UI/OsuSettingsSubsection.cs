@@ -39,6 +39,11 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "Cursor trail",
                     Bindable = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Slider tail",
+                    Bindable = config.GetBindable<bool>(OsuRulesetSetting.ShowSliderTail)
+                },
             };
         }
     }

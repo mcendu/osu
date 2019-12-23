@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osuTK;
@@ -22,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         public override bool DisplayResult => false;
 
+        private readonly Bindable<bool> showTail = new Bindable<bool>(false);
         private double animDuration;
         public bool Tracking { get; set; }
 
@@ -67,8 +69,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuRulesetConfigManager rulesetConfig)
         {
+            rulesetConfig?.BindWith(OsuRulesetSetting.ShowSliderTail, showTail);
+
             scaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
 
             scaleBindable.BindTo(HitObject.ScaleBindable);
@@ -82,9 +86,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateInitialTransforms()
         {
-            base.UpdateInitialTransforms();
+            showTail.BindValueChanged(v => circlePiece.FadeTo(v.NewValue ? 1 : 0), true);
 
-            circlePiece.FadeInFromZero(HitObject.TimeFadeIn);
+            this.FadeIn(HitObject.TimeFadeIn);
         }
 
         protected override void UpdateStateTransforms(ArmedState state)
