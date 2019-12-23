@@ -1,10 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osuTK;
@@ -20,6 +22,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         public override bool DisplayResult => false;
 
+        private double animDuration;
         public bool Tracking { get; set; }
 
         private readonly IBindable<float> scaleBindable = new Bindable<float>();
@@ -59,6 +62,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     }
                 },
             };
+
+            animDuration = Math.Min(150, hitCircle.SpanDuration / 2);
         }
 
         [BackgroundDependencyLoader]
@@ -69,6 +74,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             scaleBindable.BindTo(HitObject.ScaleBindable);
         }
 
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
+        {
+            if (!userTriggered && timeOffset >= 0)
+                ApplyResult(r => r.Type = Tracking ? HitResult.Great : HitResult.Miss);
+        }
+
         protected override void UpdateInitialTransforms()
         {
             base.UpdateInitialTransforms();
@@ -76,10 +87,25 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             circlePiece.FadeInFromZero(HitObject.TimeFadeIn);
         }
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
+        protected override void UpdateStateTransforms(ArmedState state)
         {
-            if (!userTriggered && timeOffset >= 0)
-                ApplyResult(r => r.Type = Tracking ? HitResult.Great : HitResult.Miss);
+            base.UpdateStateTransforms(state);
+
+            switch (state)
+            {
+                case ArmedState.Idle:
+                    this.Delay(HitObject.TimePreempt).FadeOut();
+                    break;
+
+                case ArmedState.Miss:
+                    this.FadeOut(animDuration);
+                    break;
+
+                case ArmedState.Hit:
+                    this.FadeOut(animDuration, Easing.OutQuint)
+                        .ScaleTo(Scale * 1.5f, animDuration, Easing.Out);
+                    break;
+            }
         }
 
         private void updatePosition() => Position = HitObject.Position - slider.Position;

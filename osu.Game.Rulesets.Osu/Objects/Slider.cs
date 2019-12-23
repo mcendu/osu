@@ -166,6 +166,8 @@ namespace osu.Game.Rulesets.Osu.Objects
                         // if this is to change, we should revisit this.
                         AddNested(TailCircle = new SliderTailCircle(this)
                         {
+                            SpanIndex = e.SpanIndex,
+                            SpanDuration = SpanDuration,
                             StartTime = e.Time,
                             Position = EndPosition,
                             StackHeight = StackHeight
