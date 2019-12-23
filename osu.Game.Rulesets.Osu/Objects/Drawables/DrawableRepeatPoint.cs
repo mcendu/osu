@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osu.Game.Skinning;
@@ -25,6 +26,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private double animDuration;
 
+        private readonly Bindable<bool> showTail = new Bindable<bool>(false);
         private readonly Container scaleContainer;
 
         public DrawableRepeatPoint(RepeatPoint repeatPoint, DrawableSlider drawableSlider)
@@ -67,8 +69,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly IBindable<float> scaleBindable = new Bindable<float>();
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuRulesetConfigManager rulesetConfig)
         {
+            rulesetConfig?.BindWith(OsuRulesetSetting.ShowSliderTail, showTail);
+
             scaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
             scaleBindable.BindTo(HitObject.ScaleBindable);
         }
@@ -83,10 +87,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             animDuration = Math.Min(150, repeatPoint.SpanDuration / 2);
 
-            this.Animate(
+            arrow.Animate(
                 d => d.FadeIn(animDuration),
                 d => d.ScaleTo(0.5f).ScaleTo(1f, animDuration * 4, Easing.OutElasticHalf)
             );
+            showTail.BindValueChanged(v => tail.FadeTo(v.NewValue ? 1 : 0), true);
+
+            this.FadeIn(HitObject.TimeFadeIn);
         }
 
         protected override void UpdateStateTransforms(ArmedState state)
