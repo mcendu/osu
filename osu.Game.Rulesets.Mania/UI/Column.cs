@@ -105,7 +105,8 @@ namespace osu.Game.Rulesets.Mania.UI
             if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            hitObjectArea.Explosions.Add(new HitExplosion(judgedObject.AccentColour.Value, judgedObject is DrawableHoldNoteTick)
+            hitObjectArea.Explosions.Add(new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitExplosion),
+                _ => new DefaultHitExplosion(judgedObject.AccentColour.Value, judgedObject is DrawableHoldNoteTick))
             {
                 Anchor = Direction.Value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre,
                 Origin = Anchor.Centre

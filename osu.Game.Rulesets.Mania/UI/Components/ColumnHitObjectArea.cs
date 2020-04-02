@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 {
     public class ColumnHitObjectArea : HitObjectArea
     {
-        public readonly Container<HitExplosion> Explosions;
+        public readonly Container Explosions;
         private readonly Drawable hitTarget;
 
         public ColumnHitObjectArea(HitObjectContainer hitObjectContainer)
@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                     RelativeSizeAxes = Axes.X,
                     Depth = 1
                 },
-                Explosions = new Container<HitExplosion>
+                Explosions = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Depth = -1,

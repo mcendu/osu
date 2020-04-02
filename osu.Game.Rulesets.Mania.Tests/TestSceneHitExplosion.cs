@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
                 scrolling.AddRange(new Drawable[]
                 {
-                    new HitExplosion((runcount / 15) % 2 == 0 ? new Color4(94, 0, 57, 255) : new Color4(6, 84, 0, 255), runcount % 6 != 0)
+                    new DefaultHitExplosion((runcount / 15) % 2 == 0 ? new Color4(94, 0, 57, 255) : new Color4(6, 84, 0, 255), runcount % 6 != 0)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

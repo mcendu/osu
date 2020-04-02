@@ -12,14 +12,14 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class HitExplosion : CompositeDrawable
+    public class DefaultHitExplosion : CompositeDrawable
     {
         public override bool RemoveWhenNotAlive => true;
 
         private readonly CircularContainer largeFaint;
         private readonly CircularContainer mainGlow1;
 
-        public HitExplosion(Color4 objectColour, bool isSmall = false)
+        public DefaultHitExplosion(Color4 objectColour, bool isSmall = false)
         {
             RelativeSizeAxes = Axes.X;
             Height = DefaultNotePiece.NOTE_HEIGHT;
