@@ -8,14 +8,30 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Mania.Configuration;
+using osu.Game.Screens.Edit;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
     public abstract partial class DrawableManiaHitObject : DrawableHitObject<ManiaHitObject>
     {
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private IBeatmap beatmap { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private Column column { get; set; }
+
+        private readonly Bindable<bool> configTimingBasedNoteColouring = new Bindable<bool>(false);
+
         /// <summary>
         /// The <see cref="ManiaAction"/> which causes this <see cref="DrawableManiaHitObject{TObject}"/> to be hit.
         /// </summary>
@@ -50,8 +66,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load([CanBeNull] IBindable<ManiaAction> action, [NotNull] IScrollingInfo scrollingInfo)
+        private void load([CanBeNull] ManiaRulesetConfigManager config, [CanBeNull] IBindable<ManiaAction> action, [NotNull] IScrollingInfo scrollingInfo)
         {
+            config?.BindWith(ManiaRulesetSetting.TimingBasedNoteColouring, configTimingBasedNoteColouring);
+
             if (action != null)
                 Action.BindTo(action);
 
@@ -63,6 +81,32 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             base.LoadComplete();
 
             Direction.BindValueChanged(OnDirectionChanged, true);
+
+            configTimingBasedNoteColouring.BindValueChanged(_ => updateSnapColour());
+            StartTimeBindable.BindValueChanged(_ => updateSnapColour(), true);
+        }
+
+        protected override void OnApply()
+        {
+            base.OnApply();
+            updateSnapColour();
+        }
+
+        private Colour4 baseAccentColour => column?.AccentColour.Value ?? Color4.Gray;
+
+        private void updateSnapColour()
+        {
+            if (beatmap == null || HitObject == null || configTimingBasedNoteColouring.Value == false)
+            {
+                AccentColour.Value = baseAccentColour;
+            }
+            else
+            {
+                int snapDivisor = beatmap.ControlPointInfo.GetClosestBeatDivisor(HitObject.StartTime);
+                var colour = BindableBeatDivisor.GetColourFor(snapDivisor, colours);
+
+                AccentColour.Value = colour != Color4.White ? colour : baseAccentColour;
+            }
         }
 
         protected virtual void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)

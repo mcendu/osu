@@ -86,9 +86,6 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
 
             if (drawableObject != null)
             {
-                accentColour.BindTo(drawableObject.AccentColour);
-                accentColour.BindValueChanged(onAccentChanged, true);
-
                 drawableObject.HitObjectApplied += hitObjectApplied;
             }
         }
@@ -97,10 +94,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Argon
         {
             var holdNoteTail = (DrawableHoldNoteTail)drawableHitObject;
 
+            accentColour.UnbindBindings();
+            accentColour.BindTo(holdNoteTail.HoldNote.AccentColour);
+            accentColour.BindValueChanged(onAccentChanged, true);
+
             hittingLayer.Recycle();
 
             hittingLayer.AccentColour.UnbindBindings();
-            hittingLayer.AccentColour.BindTo(holdNoteTail.HoldNote.AccentColour);
+            ((IBindable<Color4>)hittingLayer.AccentColour).BindTo(accentColour);
 
             hittingLayer.IsHitting.UnbindBindings();
             ((IBindable<bool>)hittingLayer.IsHitting).BindTo(holdNoteTail.HoldNote.IsHitting);

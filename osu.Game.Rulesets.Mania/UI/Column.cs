@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             DrawableManiaHitObject maniaObject = (DrawableManiaHitObject)drawableHitObject;
 
-            maniaObject.AccentColour.BindTo(AccentColour);
+            AccentColour.CopyTo(maniaObject.AccentColour);
             maniaObject.CheckHittable = hitPolicy.IsHittable;
         }
 
